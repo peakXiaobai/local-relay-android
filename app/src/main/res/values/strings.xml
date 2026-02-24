@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Local Relay</string>
+    <string name="notification_channel_name">Relay Service</string>
+    <string name="notification_channel_desc">Keeps local relay proxy running</string>
+    <string name="notification_title">Local relay is running</string>
+    <string name="notification_text">Forwarding local traffic to remote target</string>
+    <string name="notification_stop">Stop</string>
+</resources>
