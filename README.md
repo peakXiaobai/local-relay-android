@@ -43,14 +43,14 @@ Expected JSON format:
   "app_id": "local-relay-android",
   "platform": "android",
   "channel": "stable",
-  "version_code": 5,
-  "version_name": "0.3.2",
-  "file_name": "local-relay-android-0.3.2.apk",
+  "version_code": 6,
+  "version_name": "0.3.3",
+  "file_name": "local-relay-android-0.3.3.apk",
   "file_size_bytes": 0,
   "sha256": "REPLACE_WITH_REAL_SHA256",
   "updated_at": "2026-02-25T03:30:00.000Z",
-  "download_url": "http://118.196.100.121:18080/releases/local-relay-android/android/stable/0.3.2/local-relay-android-0.3.2.apk",
-  "release_notes": "local relay release 0.3.2"
+  "download_url": "http://118.196.100.121:18080/releases/local-relay-android/android/stable/0.3.3/local-relay-android-0.3.3.apk",
+  "release_notes": "local relay release 0.3.3"
 }
 ```
 
@@ -69,7 +69,7 @@ Use the helper script to publish APK + canonical `latest.json`:
 Example:
 
 ```bash
-VERSION_NAME=0.3.2 VERSION_CODE=5 ./scripts/publish-android-release-center.sh
+VERSION_NAME=0.3.3 VERSION_CODE=6 ./scripts/publish-android-release-center.sh
 ```
 
 ## Repository name
