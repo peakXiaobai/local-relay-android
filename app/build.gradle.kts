@@ -11,9 +11,9 @@ android {
         applicationId = "com.peak.localrelay"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "0.3.0"
-        buildConfigField("String", "UPDATE_INFO_URL", "\"http://118.196.100.121/local-relay-android/update.json\"")
+        versionCode = 4
+        versionName = "0.3.1"
+        buildConfigField("String", "UPDATE_INFO_URL", "\"http://118.196.100.121:18080/local-relay-android/update.json\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

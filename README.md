@@ -34,15 +34,15 @@ APK output:
 
 The app checks `BuildConfig.UPDATE_INFO_URL`, currently:
 
-`http://118.196.100.121/local-relay-android/update.json`
+`http://118.196.100.121:18080/local-relay-android/update.json`
 
 Expected JSON format:
 
 ```json
 {
-  "latestVersionCode": 3,
-  "latestVersionName": "0.3.0",
-  "apkUrl": "http://118.196.100.121/local-relay-android/local-relay-android-debug.apk",
+  "latestVersionCode": 4,
+  "latestVersionName": "0.3.1",
+  "apkUrl": "http://118.196.100.121:18080/local-relay-android/local-relay-android-debug.apk",
   "changelog": "Added in-app update detection and update prompt dialog.",
   "forceUpdate": false
 }
