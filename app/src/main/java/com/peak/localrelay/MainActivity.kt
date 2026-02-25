@@ -1,9 +1,12 @@
 package com.peak.localrelay
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
@@ -19,6 +22,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -35,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,6 +49,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,10 +73,13 @@ class MainActivity : ComponentActivity() {
 private fun RelayScreen() {
     val context = LocalContext.current
     val state by RelayController.state.collectAsState()
+    val scope = rememberCoroutineScope()
 
     var targetUrl by rememberSaveable { mutableStateOf(state.targetBaseUrl) }
     var localPortText by rememberSaveable { mutableStateOf(state.localPort.toString()) }
     var bindAll by rememberSaveable { mutableStateOf(state.bindAllInterfaces) }
+    var checkingUpdate by remember { mutableStateOf(false) }
+    var updateInfo by remember { mutableStateOf<AppUpdateInfo?>(null) }
 
     val notifPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
@@ -83,6 +92,12 @@ private fun RelayScreen() {
             localPortText = state.localPort.toString()
             bindAll = state.bindAllInterfaces
         }
+    }
+
+    LaunchedEffect(Unit) {
+        checkingUpdate = true
+        updateInfo = UpdateChecker.checkForUpdate(context, BuildConfig.UPDATE_INFO_URL)
+        checkingUpdate = false
     }
 
     Scaffold { innerPadding ->
@@ -102,6 +117,11 @@ private fun RelayScreen() {
             Text(
                 text = "Independent local routing app. It listens on localhost and forwards traffic to your remote Happy server.",
                 style = MaterialTheme.typography.bodyMedium,
+            )
+            Text(
+                text = "Version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             OutlinedTextField(
@@ -196,6 +216,25 @@ private fun RelayScreen() {
                 ) {
                     Text("Stop")
                 }
+
+                TextButton(
+                    modifier = Modifier.weight(1f),
+                    enabled = !checkingUpdate,
+                    onClick = {
+                        scope.launch {
+                            checkingUpdate = true
+                            val latest = UpdateChecker.checkForUpdate(context, BuildConfig.UPDATE_INFO_URL)
+                            checkingUpdate = false
+                            if (latest != null) {
+                                updateInfo = latest
+                            } else {
+                                Toast.makeText(context, "Already up to date", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    },
+                ) {
+                    Text(if (checkingUpdate) "Checking..." else "Check update")
+                }
             }
 
             Card(
@@ -225,6 +264,54 @@ private fun RelayScreen() {
                 }
             }
         }
+
+        updateInfo?.let { info ->
+            AlertDialog(
+                onDismissRequest = {
+                    if (!info.forceUpdate) {
+                        updateInfo = null
+                    }
+                },
+                title = {
+                    Text("Update available: ${info.latestVersionName}")
+                },
+                text = {
+                    val notes = if (info.changelog.isBlank()) {
+                        "A new APK is available."
+                    } else {
+                        info.changelog
+                    }
+                    Text(
+                        "Current: ${BuildConfig.VERSION_NAME}\nLatest: ${info.latestVersionName}\n\n$notes",
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            openUpdateLink(context, info.apkUrl)
+                            if (!info.forceUpdate) {
+                                updateInfo = null
+                            }
+                        },
+                    ) {
+                        Text("Download")
+                    }
+                },
+                dismissButton = if (!info.forceUpdate) {
+                    {
+                        TextButton(
+                            onClick = {
+                                updateInfo = null
+                            },
+                        ) {
+                            Text("Later")
+                        }
+                    }
+                } else {
+                    null
+                },
+            )
+        }
     }
 }
 
@@ -251,7 +338,12 @@ private fun RelayStatusCard(state: RelayState) {
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text("Status: $statusText", fontWeight = FontWeight.SemiBold)
-            Text(detail ?: "", style = MaterialTheme.typography.bodySmall)
+            Text(detail, style = MaterialTheme.typography.bodySmall)
         }
     }
+}
+
+private fun openUpdateLink(context: android.content.Context, url: String) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    context.startActivity(intent)
 }

@@ -10,6 +10,7 @@ This is independent from the Happy Android app.
 - Forwards HTTP requests to your configured target URL
 - Proxies WebSocket upgrades as well (for `/v1/updates` and similar realtime paths)
 - Runs as a foreground service so it stays alive while app is backgrounded
+- Checks for APK updates on launch and supports manual update checks
 
 ## Typical usage
 
@@ -28,6 +29,24 @@ This is independent from the Happy Android app.
 APK output:
 
 `app/build/outputs/apk/debug/app-debug.apk`
+
+## In-app update metadata
+
+The app checks `BuildConfig.UPDATE_INFO_URL`, currently:
+
+`http://118.196.100.121/local-relay-android/update.json`
+
+Expected JSON format:
+
+```json
+{
+  "latestVersionCode": 3,
+  "latestVersionName": "0.3.0",
+  "apkUrl": "http://118.196.100.121/local-relay-android/local-relay-android-debug.apk",
+  "changelog": "Added in-app update detection and update prompt dialog.",
+  "forceUpdate": false
+}
+```
 
 ## Notes
 
