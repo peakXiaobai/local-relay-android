@@ -34,17 +34,23 @@ APK output:
 
 The app checks `BuildConfig.UPDATE_INFO_URL`, currently:
 
-`http://118.196.100.121:18080/local-relay-android/update.json`
+`http://118.196.100.121:18080/releases/local-relay-android/android/stable/latest.json`
 
 Expected JSON format:
 
 ```json
 {
-  "latestVersionCode": 4,
-  "latestVersionName": "0.3.1",
-  "apkUrl": "http://118.196.100.121:18080/local-relay-android/local-relay-android-debug.apk",
-  "changelog": "Added in-app update detection and update prompt dialog.",
-  "forceUpdate": false
+  "app_id": "local-relay-android",
+  "platform": "android",
+  "channel": "stable",
+  "version_code": 5,
+  "version_name": "0.3.2",
+  "file_name": "local-relay-android-0.3.2.apk",
+  "file_size_bytes": 0,
+  "sha256": "REPLACE_WITH_REAL_SHA256",
+  "updated_at": "2026-02-25T03:30:00.000Z",
+  "download_url": "http://118.196.100.121:18080/releases/local-relay-android/android/stable/0.3.2/local-relay-android-0.3.2.apk",
+  "release_notes": "local relay release 0.3.2"
 }
 ```
 
@@ -53,6 +59,18 @@ Expected JSON format:
 - `Bind all interfaces` is off by default for safety.
 - If you enable `Bind all interfaces`, the relay listens on `0.0.0.0`.
 - Cleartext HTTP is enabled (`usesCleartextTraffic=true`) to support local HTTP targets.
+
+## Publish to release center
+
+Use the helper script to publish APK + canonical `latest.json`:
+
+`/Users/peak/Desktop/codex/local-relay-android/scripts/publish-android-release-center.sh`
+
+Example:
+
+```bash
+VERSION_NAME=0.3.2 VERSION_CODE=5 ./scripts/publish-android-release-center.sh
+```
 
 ## Repository name
 

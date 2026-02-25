@@ -28,10 +28,22 @@ object UpdateChecker {
             val payload = fetch(updateInfoUrl) ?: return@runCatching null
             val json = JSONObject(payload)
 
-            val latestVersionCode = json.optLong("latestVersionCode", -1L)
-            val latestVersionName = json.optString("latestVersionName", latestVersionCode.toString())
-            val apkUrl = json.optString("apkUrl", "")
-            val changelog = json.optString("changelog", "")
+            val latestVersionCode = when {
+                json.has("version_code") -> json.optLong("version_code", -1L)
+                else -> json.optLong("latestVersionCode", -1L)
+            }
+            val latestVersionName = when {
+                json.has("version_name") -> json.optString("version_name", latestVersionCode.toString())
+                else -> json.optString("latestVersionName", latestVersionCode.toString())
+            }
+            val apkUrl = when {
+                json.has("download_url") -> json.optString("download_url", "")
+                else -> json.optString("apkUrl", "")
+            }
+            val changelog = when {
+                json.has("release_notes") -> json.optString("release_notes", "")
+                else -> json.optString("changelog", "")
+            }
             val forceUpdate = json.optBoolean("forceUpdate", false)
 
             if (latestVersionCode <= currentVersionCode || apkUrl.isBlank()) {
