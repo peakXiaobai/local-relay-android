@@ -109,17 +109,17 @@ private fun RelayScreen() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Text(
-                text = "Local Relay",
+                text = "本地中继",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
             )
 
             Text(
-                text = "Independent local routing app. It listens on localhost and forwards traffic to your remote Happy server.",
+                text = "独立本地路由应用。监听本机端口并将流量转发到你的远程 Happy 服务。",
                 style = MaterialTheme.typography.bodyMedium,
             )
             Text(
-                text = "Version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                text = "版本 ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -131,7 +131,7 @@ private fun RelayScreen() {
                     targetUrl = it
                     RelayController.clearError()
                 },
-                label = { Text("Target base URL") },
+                label = { Text("目标基础 URL") },
                 placeholder = { Text("http://118.196.100.121:3005") },
                 singleLine = true,
             )
@@ -143,7 +143,7 @@ private fun RelayScreen() {
                     localPortText = it.filter { ch -> ch.isDigit() }
                     RelayController.clearError()
                 },
-                label = { Text("Local listen port") },
+                label = { Text("本地监听端口") },
                 placeholder = { Text("3005") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
@@ -158,9 +158,9 @@ private fun RelayScreen() {
                     onCheckedChange = { bindAll = it },
                 )
                 Column {
-                    Text("Bind all interfaces (0.0.0.0)")
+                    Text("监听所有网卡 (0.0.0.0)")
                     Text(
-                        text = "Off = localhost only (safer).",
+                        text = "关闭时仅监听 localhost（更安全）。",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -178,12 +178,12 @@ private fun RelayScreen() {
                     onClick = {
                         val parsedPort = localPortText.toIntOrNull()
                         if (parsedPort == null || parsedPort !in 1..65535) {
-                            RelayController.setStatus(RelayStatus.ERROR, "Port must be between 1 and 65535")
+                            RelayController.setStatus(RelayStatus.ERROR, "端口必须在 1 到 65535 之间")
                             return@Button
                         }
 
                         if (targetUrl.isBlank()) {
-                            RelayController.setStatus(RelayStatus.ERROR, "Target URL cannot be empty")
+                            RelayController.setStatus(RelayStatus.ERROR, "目标 URL 不能为空")
                             return@Button
                         }
 
@@ -205,7 +205,7 @@ private fun RelayScreen() {
                         RelayService.start(context, config)
                     },
                 ) {
-                    Text("Start")
+                    Text("启动")
                 }
 
                 TextButton(
@@ -214,7 +214,7 @@ private fun RelayScreen() {
                         RelayService.stop(context)
                     },
                 ) {
-                    Text("Stop")
+                    Text("停止")
                 }
 
                 TextButton(
@@ -228,12 +228,12 @@ private fun RelayScreen() {
                             if (latest != null) {
                                 updateInfo = latest
                             } else {
-                                Toast.makeText(context, "Already up to date", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "当前已是最新版本", Toast.LENGTH_SHORT).show()
                             }
                         }
                     },
                 ) {
-                    Text(if (checkingUpdate) "Checking..." else "Check update")
+                    Text(if (checkingUpdate) "检查中..." else "检查更新")
                 }
             }
 
@@ -246,7 +246,7 @@ private fun RelayScreen() {
                 ),
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
-                    Text("Logs", fontWeight = FontWeight.SemiBold)
+                    Text("日志", fontWeight = FontWeight.SemiBold)
 
                     LazyColumn(
                         modifier = Modifier
@@ -273,16 +273,16 @@ private fun RelayScreen() {
                     }
                 },
                 title = {
-                    Text("Update available: ${info.latestVersionName}")
+                    Text("发现新版本：${info.latestVersionName}")
                 },
                 text = {
                     val notes = if (info.changelog.isBlank()) {
-                        "A new APK is available."
+                        "检测到可用的新 APK。"
                     } else {
                         info.changelog
                     }
                     Text(
-                        "Current: ${BuildConfig.VERSION_NAME}\nLatest: ${info.latestVersionName}\n\n$notes",
+                        "当前版本：${BuildConfig.VERSION_NAME}\n最新版本：${info.latestVersionName}\n\n$notes",
                     )
                 },
                 confirmButton = {
@@ -294,7 +294,7 @@ private fun RelayScreen() {
                             }
                         },
                     ) {
-                        Text("Download")
+                        Text("下载")
                     }
                 },
                 dismissButton = if (!info.forceUpdate) {
@@ -304,7 +304,7 @@ private fun RelayScreen() {
                                 updateInfo = null
                             },
                         ) {
-                            Text("Later")
+                            Text("稍后")
                         }
                     }
                 } else {
@@ -318,16 +318,16 @@ private fun RelayScreen() {
 @Composable
 private fun RelayStatusCard(state: RelayState) {
     val statusText = when (state.status) {
-        RelayStatus.STOPPED -> "Stopped"
-        RelayStatus.STARTING -> "Starting"
-        RelayStatus.RUNNING -> "Running"
-        RelayStatus.ERROR -> "Error"
+        RelayStatus.STOPPED -> "已停止"
+        RelayStatus.STARTING -> "启动中"
+        RelayStatus.RUNNING -> "运行中"
+        RelayStatus.ERROR -> "异常"
     }
 
     val detail = when {
         state.lastError != null -> state.lastError
-        state.status == RelayStatus.RUNNING -> "Forwarding local traffic to ${state.targetBaseUrl}"
-        else -> "Ready"
+        state.status == RelayStatus.RUNNING -> "正在将本地流量转发到 ${state.targetBaseUrl}"
+        else -> "就绪"
     }
 
     Card(
@@ -337,7 +337,7 @@ private fun RelayStatusCard(state: RelayState) {
         ),
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
-            Text("Status: $statusText", fontWeight = FontWeight.SemiBold)
+            Text("状态：$statusText", fontWeight = FontWeight.SemiBold)
             Text(detail, style = MaterialTheme.typography.bodySmall)
         }
     }

@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">Local Relay</string>
-    <string name="notification_channel_name">Relay Service</string>
-    <string name="notification_channel_desc">Keeps local relay proxy running</string>
-    <string name="notification_title">Local relay is running</string>
-    <string name="notification_text">Forwarding local traffic to remote target</string>
-    <string name="notification_stop">Stop</string>
+    <string name="app_name">本地中继</string>
+    <string name="notification_channel_name">中继服务</string>
+    <string name="notification_channel_desc">保持本地中继代理持续运行</string>
+    <string name="notification_title">本地中继正在运行</string>
+    <string name="notification_text">正在将本地流量转发到远程目标</string>
+    <string name="notification_stop">停止</string>
 </resources>

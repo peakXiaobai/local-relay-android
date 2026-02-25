@@ -35,7 +35,7 @@ class RelayService : Service() {
         when (intent?.action) {
             ACTION_STOP -> {
                 scope.launch {
-                    stopRelay("Stopped by user")
+                    stopRelay("用户已停止")
                     stopSelf()
                 }
             }
@@ -46,7 +46,7 @@ class RelayService : Service() {
                 RelayController.setConfig(config)
                 RelayController.clearError()
 
-                startForeground(NOTIFICATION_ID, buildNotification(config, "Starting relay..."))
+                startForeground(NOTIFICATION_ID, buildNotification(config, "正在启动中继..."))
 
                 startJob?.cancel()
                 startJob = scope.launch {
@@ -69,7 +69,7 @@ class RelayService : Service() {
             relayEngine.stop()
         }
         RelayController.setStatus(RelayStatus.STOPPED)
-        log("Relay service destroyed")
+        log("中继服务已销毁")
         scope.cancel()
     }
 
@@ -77,7 +77,7 @@ class RelayService : Service() {
 
     private suspend fun startRelay(config: RelayConfig) {
         RelayController.setStatus(RelayStatus.STARTING)
-        log("Starting relay -> ${config.targetBaseUrl}")
+        log("正在启动中继 -> ${config.targetBaseUrl}")
 
         try {
             relayEngine.start(config) { line ->
@@ -86,12 +86,12 @@ class RelayService : Service() {
 
             RelayController.setStatus(RelayStatus.RUNNING)
             val bindHost = if (config.bindAllInterfaces) "0.0.0.0" else "127.0.0.1"
-            updateNotification(config, "Listening on $bindHost:${config.localPort}")
-            log("Relay running on $bindHost:${config.localPort}")
+            updateNotification(config, "已监听 $bindHost:${config.localPort}")
+            log("中继运行中：$bindHost:${config.localPort}")
         } catch (error: Throwable) {
-            RelayController.setStatus(RelayStatus.ERROR, error.message ?: "Unknown error")
-            log("Failed to start relay: ${error.message}")
-            updateNotification(config, "Relay failed: ${error.message}")
+            RelayController.setStatus(RelayStatus.ERROR, error.message ?: "未知错误")
+            log("中继启动失败：${error.message}")
+            updateNotification(config, "中继异常：${error.message}")
             stopSelf()
         }
     }
@@ -100,7 +100,7 @@ class RelayService : Service() {
         runCatching {
             relayEngine.stop()
         }.onFailure {
-            log("Stop error: ${it.message}")
+            log("停止失败：${it.message}")
         }
         RelayController.setStatus(RelayStatus.STOPPED)
         log(reason)
@@ -154,7 +154,7 @@ class RelayService : Service() {
             .setContentText(contentText)
             .setStyle(
                 NotificationCompat.BigTextStyle()
-                    .bigText("$contentText\nTarget: ${config.targetBaseUrl}"),
+                    .bigText("$contentText\n目标：${config.targetBaseUrl}"),
             )
             .setOngoing(true)
             .setOnlyAlertOnce(true)

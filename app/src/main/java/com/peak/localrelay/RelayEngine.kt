@@ -84,7 +84,7 @@ class RelayEngine {
 
         client = currentClient
         server = currentServer
-        log("Relay started: http://$host:${config.localPort} -> ${baseUrl.protocol.name}://${baseUrl.host}:${baseUrl.port}")
+        log("中继已启动：http://$host:${config.localPort} -> ${baseUrl.protocol.name}://${baseUrl.host}:${baseUrl.port}")
     }
 
     suspend fun stop() {
@@ -125,8 +125,8 @@ class RelayEngine {
 
             log("HTTP ${call.request.httpMethod.value} ${call.request.uri} -> ${response.status.value}")
         } catch (error: Throwable) {
-            log("HTTP proxy error: ${error.message}")
-            call.respond(HttpStatusCode.BadGateway, "Relay error: ${error.message}")
+            log("HTTP 代理异常：${error.message}")
+            call.respond(HttpStatusCode.BadGateway, "中继错误：${error.message}")
         }
     }
 
@@ -148,7 +148,7 @@ class RelayEngine {
                 copyRequestHeaders(call.request.headers, headers)
             }
 
-            log("WebSocket connected: ${call.request.uri}")
+            log("WebSocket 已连接：${call.request.uri}")
 
             coroutineScope {
                 val downstreamToUpstream = async {
@@ -162,10 +162,10 @@ class RelayEngine {
             }
 
             upstream.close()
-            log("WebSocket closed: ${call.request.uri}")
+            log("WebSocket 已关闭：${call.request.uri}")
         } catch (error: Throwable) {
-            log("WebSocket proxy error: ${error.message}")
-            downstream.close(CloseReason(CloseReason.Codes.INTERNAL_ERROR, "Relay WebSocket error"))
+            log("WebSocket 代理异常：${error.message}")
+            downstream.close(CloseReason(CloseReason.Codes.INTERNAL_ERROR, "中继 WebSocket 错误"))
         }
     }
 
@@ -178,7 +178,7 @@ class RelayEngine {
                     is Frame.Ping -> destination.send(Frame.Ping(frame.readBytes()))
                     is Frame.Pong -> destination.send(Frame.Pong(frame.readBytes()))
                     is Frame.Close -> {
-                        destination.close(frame.readReason() ?: CloseReason(CloseReason.Codes.NORMAL, "closed"))
+                        destination.close(frame.readReason() ?: CloseReason(CloseReason.Codes.NORMAL, "已关闭"))
                         return
                     }
                 }
